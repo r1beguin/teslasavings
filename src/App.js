@@ -1,6 +1,8 @@
 import React from "react";
 import { Grommet, Box,  } from "grommet";
 
+import Tracker from './features/tracker/Tracker'
+import Social from './features/social/Social'
 
 
 const theme = {
@@ -17,7 +19,8 @@ function App() {
   return (
     <Grommet theme={theme} full>
       <Box fill align="center" justify="center" background="dark-2">
-        
+        <Tracker />
+        <Social />
       </Box>
   
     </Grommet>
