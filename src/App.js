@@ -7,11 +7,15 @@ import Social from './features/social/Social'
 
 const theme = {
   global: {
+    colors: {
+      brand: '#cc0000',
+      ok: '#00C781',
+    },
     font: {
       family: "Roboto",
       size: "18px",
       height: "20px",
-    },
+    }
   },
 };
 
