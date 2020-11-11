@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Box, Text, Button, Anchor} from "grommet";
+import {Box, Text, ResponsiveContext} from "grommet";
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from "recharts";
 import { color } from "openlayers";
 const Tracker = () => {
@@ -12,6 +12,8 @@ const Tracker = () => {
     const [timeSelected, setTimeSelected] = React.useState('D');
     const [time, setTime] = React.useState('DAILY');
     const [timeLabel, setTimeLabel] = React.useState('Time Series (Daily)');
+
+    const size = React.useContext(ResponsiveContext);
 
     React.useEffect(() => {
 
@@ -37,7 +39,7 @@ const Tracker = () => {
         <Box align="center" justify="center" gap="small" margin="large">
             <Text>Tesla savings</Text>
             <Text color="brand">{current && current.match(/^\d+\.\d{2}/g,'')}</Text>
-            <LineChart width={600} height={400} data={data}
+            <LineChart width={size!=="small" ? 600 : 400} height={size!=="small" ? 400 : 300} data={data}
             margin={{top: 5, right: 30, left: 20}}>
                 <XAxis dataKey="name" hide interval="preserveStartEnd" tick={false} />
                 <YAxis tick={false} hide domain={[0, 3000]}/>
