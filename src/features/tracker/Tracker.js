@@ -3,62 +3,87 @@ import React from "react";
 import {Box, Text, ResponsiveContext, Image} from "grommet";
 import {LineChart, Line, XAxis, YAxis, Tooltip} from "recharts";
 
-import tesla from "../../images/tesla.png";
+
+import secret from "../../secret.json";
 
 import Savings from "./Savings";
 
 const Tracker = () => {
+    const hour='interval=5min&range=1d'
+    const day= 'interval=15min&range=5d';
+    const week='interval=60min&range=1mo';
+    const month= 'interval=1d&range=1y';
+    const max='interval=1d&range=max';
     
     const [data, setData] = React.useState();
     const [current, setCurrent] = React.useState();
 
-    const API = 'DLTD6FNXRXZ8DWS3';
-    const [timeSelected, setTimeSelected] = React.useState('D');
-    const [time, setTime] = React.useState('DAILY');
-    const [timeLabel, setTimeLabel] = React.useState('Time Series (Daily)');
+    
+    const [timeSelected, setTimeSelected] = React.useState('M');
+    const [time, setTime] = React.useState(month);
 
     const size = React.useContext(ResponsiveContext);
 
+    
+
+
     React.useEffect(() => {
 
-        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_${time}&symbol=TSLA&apikey=${API}`)
-      .then(response => response.json())
-      .then(data => {
+        fetch(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?${time}&symbol=TSLA&region=US`, {
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-key": secret,
+                "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
+            }
+        })
+        .then(response => response.json())
+        .then(data => { 
+            const arr = [];
+            data.chart.result[0].indicators.quote[0].close.map((item,i) => {
+                let unix_timestamp = data.chart.result[0].timestamp[i]
+                var date = new Date(unix_timestamp * 1000);
+                var formattedTime = date.toLocaleString('en-GB', { timeZone: 'UTC' });
+                arr.push({x: formattedTime, close: item})
 
-        let dataRaw = []; 
-        setCurrent(data[timeLabel][data["Meta Data"]["3. Last Refreshed"]]['4. close'])
-        for (let key in data[timeLabel]) {
-            dataRaw.push({name : key,value : data[timeLabel][key]['4. close']})
+        })
+            setData(arr)
+        })
+
+
+      fetch("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=TSLA&region=US", {
+        "method": "GET",
+        "headers": {
+            "x-rapidapi-key": "396c8c801cmsh03d8aa703d5356cp10f6bfjsneeb135511ccb",
+            "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
         }
+    })
+    .then(response => 
+        response.json()
+        
+    )
+    .then(data => {setCurrent(data.quoteResponse.result[0].ask);
+    console.log(data)})
 
-        setData(dataRaw.reverse());
-      });
-
-      
-
-    },[time, timeLabel])
+    },[time])
 
 
     return( 
-        <Box align="center"  gap="small" margin="large">
+        <Box fill="horizontal" align="center"  gap="small">
 
-            <Box height="xxsmall" width="xxsmall">
-                <Image src={tesla} fit="cover"/>
-            </Box>
-            
+         
             <Box>
-                <Text color="brand">{current && current.match(/^\d+\.\d{2}/g,'')}</Text>
+                <Text color="brand">{current}</Text>
             </Box>
 
             <Box>
                 <LineChart width={size!=="small" ? 600 : 400} height={size!=="small" ? 400 : 300} data={data}
                 margin={{top: 5, right: 30, left: 20}}>
-                    <XAxis dataKey="name" hide interval="preserveStartEnd" tick={false} />
-                    <YAxis tick={false} hide domain={[0, 3000]}/>
+                    <XAxis dataKey="x" hide interval="preserveStartEnd" tick={false} />
+                    <YAxis tick={false} hide />
                     
                     <Tooltip contentStyle={{color: "#cc0000"}}/>
                     
-                    <Line type="monotone" dataKey="value" stroke="#cc0000" dot={false}/>
+                    <Line dataKey="close" type="monotone"  stroke="#cc0000" dot={false}/>
                 </LineChart>
             </Box>
 
@@ -66,8 +91,15 @@ const Tracker = () => {
                 <Box 
                     as="a" 
                     onClick={() => { 
-                        setTime('MONTHLY');
-                        setTimeLabel('Monthly Time Series');
+                        setTime(max);
+                        setTimeSelected('A');
+                    }}>
+                    <Text color={timeSelected==='A' ? "ok" : "brand"}>A</Text>
+                </Box>
+                <Box 
+                    as="a" 
+                    onClick={() => { 
+                        setTime(month);
                         setTimeSelected('M');
                     }}>
                     <Text color={timeSelected==='M' ? "ok" : "brand"}>M</Text>
@@ -75,8 +107,7 @@ const Tracker = () => {
                 <Box 
                     as="a" 
                     onClick={() => { 
-                        setTime('WEEKLY');
-                        setTimeLabel('Weekly Time Series');
+                        setTime(week);
                         setTimeSelected('W')
                     }}>
                     <Text color={timeSelected==='W' ? "ok" : "brand"}>W</Text>
@@ -84,8 +115,7 @@ const Tracker = () => {
                 <Box 
                     as="a" 
                     onClick={() => { 
-                        setTime('DAILY');
-                        setTimeLabel('Time Series (Daily)');
+                        setTime(day);
                         setTimeSelected('D')
                     }}>
                     <Text color={timeSelected==='D' ? "ok" : "brand"}>D</Text>
@@ -93,8 +123,7 @@ const Tracker = () => {
                 <Box 
                     as="a" 
                     onClick={() => { 
-                        setTime('INTRADAY&interval=60min');
-                        setTimeLabel('Time Series (60min)');
+                        setTime(hour);
                         setTimeSelected("H");
                     }}>
                     <Text color={timeSelected==='H' ? "ok" : "brand"}>H</Text>
