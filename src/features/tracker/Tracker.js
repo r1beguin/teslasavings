@@ -97,7 +97,7 @@ const Tracker = ({setTsla, situation}) => {
             <Box align="center">
                 <Text color="brand">{current}</Text>
                 {situation && (
-                    <Text color="brand">{situation}$</Text>
+                    <Text color="brand">{situation.toString()}$</Text>
                 )}
                 
             </Box>
