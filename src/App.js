@@ -1,5 +1,5 @@
 import React from "react";
-import { Grommet, Box, Image, Button, Stack } from "grommet";
+import { Grommet, Box, Image, Button, Stack, ResponsiveContext } from "grommet";
 
 import Tracker from './features/tracker/Tracker'
 import Social from './features/social/Social'
@@ -30,6 +30,9 @@ function App() {
   const [full, setFull] = React.useState(false);
   const [tsla, setTsla] = React.useState();
   const [situation, setSituation] = React.useState('');
+
+  const size = React.useContext(ResponsiveContext);
+
   return (
     <Grommet theme={theme} full  background="dark-2">
       
@@ -54,7 +57,7 @@ function App() {
 
           
         <FullScreen handle={handle}>
-        <Box fill="horizontal" align="center" justify="center" overflow="auto">
+        <Box fill align="center" justify="center" overflow="auto">
         {full && (
           <Box fill="horizontal" margin="medium" >
             <Stack anchor="right">
@@ -63,11 +66,6 @@ function App() {
                   <Image src={tesla} fit="cover"/>
                 </Box>
               </Box>
-              
-              <Button icon={<Contract color="brand" onClick={() => {
-                handle.exit();
-                setFull(false);
-              }}/>} />
               
             </Stack>
           </Box>
