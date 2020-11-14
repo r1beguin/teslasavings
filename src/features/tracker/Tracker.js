@@ -8,7 +8,7 @@ import secret from "../../secret.json";
 
 import Savings from "./Savings";
 
-const Tracker = () => {
+const Tracker = ({setTsla, situation}) => {
     const hour='interval=5min&range=1d'
     const day= 'interval=15min&range=5d';
     const week='interval=60min&range=1mo';
@@ -28,41 +28,64 @@ const Tracker = () => {
 
 
     React.useEffect(() => {
-
         fetch(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?${time}&symbol=TSLA&region=US`, {
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-key": secret,
+                    "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
+                }
+            })
+            .then(response => response.json())
+            .then(data => { 
+                const arr = [];
+                data.chart.result[0].indicators.quote[0].close.map((item,i) => {
+                    let unix_timestamp = data.chart.result[0].timestamp[i]
+                    var date = new Date(unix_timestamp * 1000);
+                    var formattedTime = date.toLocaleString('en-GB', { timeZone: 'UTC' });
+                    arr.push({x: formattedTime, close: item})
+    
+            })
+                setData(arr)
+            })
+
+            fetch("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=TSLA&region=US", {
             "method": "GET",
             "headers": {
-                "x-rapidapi-key": secret,
+                "x-rapidapi-key": "396c8c801cmsh03d8aa703d5356cp10f6bfjsneeb135511ccb",
                 "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
             }
         })
-        .then(response => response.json())
-        .then(data => { 
-            const arr = [];
-            data.chart.result[0].indicators.quote[0].close.map((item,i) => {
-                let unix_timestamp = data.chart.result[0].timestamp[i]
-                var date = new Date(unix_timestamp * 1000);
-                var formattedTime = date.toLocaleString('en-GB', { timeZone: 'UTC' });
-                arr.push({x: formattedTime, close: item})
-
+        .then(response => 
+            response.json()
+            
+        )
+        .then(data => {setCurrent(data.quoteResponse.result[0].ask);
+        setTsla(data.quoteResponse.result[0].ask)})
+    
+        try {
+        setInterval( async() => {
+            
+            
+    
+          fetch("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=TSLA&region=US", {
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-key": "396c8c801cmsh03d8aa703d5356cp10f6bfjsneeb135511ccb",
+                "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
+            }
         })
-            setData(arr)
-        })
-
-
-      fetch("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=TSLA&region=US", {
-        "method": "GET",
-        "headers": {
-            "x-rapidapi-key": "396c8c801cmsh03d8aa703d5356cp10f6bfjsneeb135511ccb",
-            "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
+        .then(response => 
+            response.json()
+            
+        )
+        .then(data => {setCurrent(data.quoteResponse.result[0].ask);
+        setTsla(data.quoteResponse.result[0].ask)})
+        }, 30000);
+        } catch (e){
+            console.log(e)
         }
-    })
-    .then(response => 
-        response.json()
-        
-    )
-    .then(data => {setCurrent(data.quoteResponse.result[0].ask);
-    console.log(data)})
+
+       
 
     },[time])
 
@@ -71,8 +94,12 @@ const Tracker = () => {
         <Box fill="horizontal" align="center"  gap="small">
 
          
-            <Box>
+            <Box align="center">
                 <Text color="brand">{current}</Text>
+                {situation && (
+                    <Text color="brand">{situation}$</Text>
+                )}
+                
             </Box>
 
             <Box>
@@ -130,7 +157,7 @@ const Tracker = () => {
                 </Box>
             </Box>
 
-            <Savings tsla={current}/>
+           
 
         </Box>
     )

@@ -28,7 +28,7 @@ const useStateWithLocalStorageInt = localStorageKey => {
     return [value, setValue];
   };
 
-const Savings = ({tsla}) => {
+const Savings = ({tsla, setSituation}) => {
 
     const [stock, setStock] = useStateWithLocalStorage('stock');
     const [goal, setGoal] = useStateWithLocalStorageInt('goal');
@@ -39,7 +39,8 @@ const Savings = ({tsla}) => {
 
     const onCalcul = () => {
         let result=0;
-
+        
+        if (stock[0].number){
         stock.map(item => {
             if( item.number && item.price) {
                 result+=item.number*tsla
@@ -47,7 +48,17 @@ const Savings = ({tsla}) => {
         })
 
         setCurrent(result);
+        setSituation(result)
+        }else {
+            setCurrent('');
+        setSituation('')
+        }
     }
+
+    React.useEffect(()=> {
+        setSituation(current);
+        onCalcul();
+    }, [tsla])
 
     return (
         <Box margin="small" align="center" justify="center" gap="small">
