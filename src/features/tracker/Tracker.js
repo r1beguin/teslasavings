@@ -60,32 +60,7 @@ const Tracker = ({setTsla, situation}) => {
             
         )
         .then(data => {setCurrent(data.quoteResponse.result[0].ask);
-        setTsla(data.quoteResponse.result[0].ask)})
-    
-        try {
-        setInterval( async() => {
-            
-            
-    
-          fetch("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=TSLA&region=US", {
-            "method": "GET",
-            "headers": {
-                "x-rapidapi-key": "396c8c801cmsh03d8aa703d5356cp10f6bfjsneeb135511ccb",
-                "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
-            }
-        })
-        .then(response => 
-            response.json()
-            
-        )
-        .then(data => {setCurrent(data.quoteResponse.result[0].ask);
-        setTsla(data.quoteResponse.result[0].ask)})
-        }, 30000);
-        } catch (e){
-            console.log(e)
-        }
-
-       
+        setTsla(data.quoteResponse.result[0].ask)})       
 
     },[time])
 
@@ -95,9 +70,9 @@ const Tracker = ({setTsla, situation}) => {
 
          
             <Box align="center">
-                <Text color="brand">{current}</Text>
+                <Text color="brand">{current && current}</Text>
                 {situation && (
-                    <Text color="brand">{situation.toString()}$</Text>
+                    <Text color="brand">{situation && situation.toString().match(/^\d+.\d{2}/g,'')}$</Text>
                 )}
                 
             </Box>

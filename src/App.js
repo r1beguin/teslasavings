@@ -16,6 +16,7 @@ const theme = {
     colors: {
       brand: '#cc0000',
       ok: '#00C781',
+      back: "#292929",
     },
     font: {
       family: "Roboto",
@@ -34,7 +35,7 @@ function App() {
   const size = React.useContext(ResponsiveContext);
 
   return (
-    <Grommet theme={theme} full  background="dark-2">
+    <Grommet theme={theme} full  background="back">
       
         <Box fill="horizontal" align="center" justify="center" overflow="auto">
         {!full && (
